@@ -57,7 +57,9 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling:1.6.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-savedstate:2.8.0")
     implementation("androidx.savedstate:savedstate-ktx:1.2.1")
+    implementation("androidx.activity:activity-ktx:1.9.0")
 }
 
 flutter {
