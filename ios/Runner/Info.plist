@@ -45,5 +45,18 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	
+	<!-- Background modes for timer functionality -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>background-app-refresh</string>
+		<string>background-processing</string>
+	</array>
+	
+	<!-- Background task identifier -->
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.example.native_timer.background</string>
+	</array>
 </dict>
 </plist>
