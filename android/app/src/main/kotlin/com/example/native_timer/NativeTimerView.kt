@@ -12,6 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.savedstate.SavedStateRegistryOwner
+import androidx.savedstate.ViewTreeSavedStateRegistryOwner
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.ViewTreeViewModelStoreOwner
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
 
@@ -19,6 +25,17 @@ class NativeTimerView(context: Context, private val channel: MethodChannel) : Pl
 
     private val composeView = ComposeView(context).apply {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        // Set the ViewTreeLifecycleOwner, ViewTreeViewModelStoreOwner, and ViewTreeSavedStateRegistryOwner
+        // This is crucial for Compose to correctly manage its lifecycle within a PlatformView
+        if (context is LifecycleOwner) {
+            ViewTreeLifecycleOwner.set(this, context)
+        }
+        if (context is ViewModelStoreOwner) {
+            ViewTreeViewModelStoreOwner.set(this, context)
+        }
+        if (context is SavedStateRegistryOwner) {
+            ViewTreeSavedStateRegistryOwner.set(this, context)
+        }
         setContent {
             MaterialTheme {
                 TimerControls(channel = channel)
