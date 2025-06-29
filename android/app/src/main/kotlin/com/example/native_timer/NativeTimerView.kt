@@ -12,12 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewTreeLifecycleOwner
-import androidx.savedstate.SavedStateRegistryOwner
-import androidx.savedstate.ViewTreeSavedStateRegistryOwner
-import androidx.lifecycle.ViewModelStoreOwner
-import androidx.lifecycle.ViewTreeViewModelStoreOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.savedstate.findViewTreeSavedStateRegistryOwner
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
 
@@ -27,15 +24,20 @@ class NativeTimerView(context: Context, private val channel: MethodChannel) : Pl
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         // Set the ViewTreeLifecycleOwner, ViewTreeViewModelStoreOwner, and ViewTreeSavedStateRegistryOwner
         // This is crucial for Compose to correctly manage its lifecycle within a PlatformView
-        if (context is LifecycleOwner) {
-            ViewTreeLifecycleOwner.set(this, context)
+        val lifecycleOwner = findViewTreeLifecycleOwner()
+        val viewModelStoreOwner = findViewTreeViewModelStoreOwner()
+        val savedStateRegistryOwner = findViewTreeSavedStateRegistryOwner()
+
+        if (lifecycleOwner != null) {
+            ViewTreeLifecycleOwner.set(this, lifecycleOwner)
         }
-        if (context is ViewModelStoreOwner) {
-            ViewTreeViewModelStoreOwner.set(this, context)
+        if (viewModelStoreOwner != null) {
+            ViewTreeViewModelStoreOwner.set(this, viewModelStoreOwner)
         }
-        if (context is SavedStateRegistryOwner) {
-            ViewTreeSavedStateRegistryOwner.set(this, context)
+        if (savedStateRegistryOwner != null) {
+            ViewTreeSavedStateRegistryOwner.set(this, savedStateRegistryOwner)
         }
+
         setContent {
             MaterialTheme {
                 TimerControls(channel = channel)

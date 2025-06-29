@@ -61,6 +61,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     implementation("androidx.savedstate:savedstate-ktx:1.2.1")
     implementation("androidx.activity:activity-ktx:1.9.0")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.6.2")
 }
 
 flutter {
