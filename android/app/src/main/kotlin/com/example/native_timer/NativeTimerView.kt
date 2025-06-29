@@ -15,6 +15,10 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.savedstate.findViewTreeSavedStateRegistryOwner
+import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeViewModelStoreOwner
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
 
@@ -27,15 +31,16 @@ class NativeTimerView(context: Context, private val channel: MethodChannel) : Pl
         val lifecycleOwner = findViewTreeLifecycleOwner()
         val viewModelStoreOwner = findViewTreeViewModelStoreOwner()
         val savedStateRegistryOwner = findViewTreeSavedStateRegistryOwner()
+        val test = setViewTreeLifecycleOwner(lifecycleOwner)
 
         if (lifecycleOwner != null) {
-            ViewTreeLifecycleOwner.set(this, lifecycleOwner)
+            setViewTreeLifecycleOwner( lifecycleOwner)
         }
         if (viewModelStoreOwner != null) {
-            ViewTreeViewModelStoreOwner.set(this, viewModelStoreOwner)
+            setViewTreeViewModelStoreOwner( viewModelStoreOwner)
         }
         if (savedStateRegistryOwner != null) {
-            ViewTreeSavedStateRegistryOwner.set(this, savedStateRegistryOwner)
+            setViewTreeSavedStateRegistryOwner(savedStateRegistryOwner)
         }
 
         setContent {
