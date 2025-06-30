@@ -1,0 +1,2 @@
+/Users/lukauux/Documents/flutter_pocs/native_timer/android/app/.cxx/Debug/3h4b2x2z/x86_64/CMakeFiles/edit_cache.dir
+/Users/lukauux/Documents/flutter_pocs/native_timer/android/app/.cxx/Debug/3h4b2x2z/x86_64/CMakeFiles/rebuild_cache.dir

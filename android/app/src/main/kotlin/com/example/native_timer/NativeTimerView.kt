@@ -12,12 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.lifecycle.findViewTreeLifecycleOwner
-import androidx.lifecycle.findViewTreeViewModelStoreOwner
-import androidx.savedstate.findViewTreeSavedStateRegistryOwner
-import androidx.lifecycle.setViewTreeLifecycleOwner
-import androidx.lifecycle.setViewTreeViewModelStoreOwner
-import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import androidx.lifecycle.*
+import androidx.savedstate.*
+import androidx.activity.ComponentActivity
 
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
@@ -26,21 +23,18 @@ class NativeTimerView(context: Context, private val channel: MethodChannel) : Pl
 
     private val composeView = ComposeView(context).apply {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-        // Set the ViewTreeLifecycleOwner, ViewTreeViewModelStoreOwner, and ViewTreeSavedStateRegistryOwner
-        // This is crucial for Compose to correctly manage its lifecycle within a PlatformView
-        val lifecycleOwner = findViewTreeLifecycleOwner()
-        val viewModelStoreOwner = findViewTreeViewModelStoreOwner()
-        val savedStateRegistryOwner = findViewTreeSavedStateRegistryOwner()
-        val test = setViewTreeLifecycleOwner(lifecycleOwner)
-
-        if (lifecycleOwner != null) {
-            setViewTreeLifecycleOwner( lifecycleOwner)
-        }
-        if (viewModelStoreOwner != null) {
-            setViewTreeViewModelStoreOwner( viewModelStoreOwner)
-        }
-        if (savedStateRegistryOwner != null) {
-            setViewTreeSavedStateRegistryOwner(savedStateRegistryOwner)
+        
+        // For PlatformView, we need to handle the lifecycle properly
+        // Try to get the activity from context and set up the owners
+        if (context is ComponentActivity) {
+            setViewTreeLifecycleOwner(context)
+            setViewTreeViewModelStoreOwner(context)
+            setViewTreeSavedStateRegistryOwner(context)
+        } else {
+            // Fallback: try to find existing owners from the parent view hierarchy
+            findViewTreeLifecycleOwner()?.let { setViewTreeLifecycleOwner(it) }
+            findViewTreeViewModelStoreOwner()?.let { setViewTreeViewModelStoreOwner(it) }
+            findViewTreeSavedStateRegistryOwner()?.let { setViewTreeSavedStateRegistryOwner(it) }
         }
 
         setContent {
