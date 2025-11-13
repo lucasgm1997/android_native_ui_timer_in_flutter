@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -32,8 +30,7 @@ class NativeTimerPage extends StatefulWidget {
 
 class _NativeTimerPageState extends State<NativeTimerPage> {
   static const platform = MethodChannel('com.example.native_timer/timer');
-  late Timer _timer;
-  int _duration = 0;
+  String _timeText = "00:00:00";
   bool _isRunning = false;
 
   @override
@@ -44,52 +41,17 @@ class _NativeTimerPageState extends State<NativeTimerPage> {
 
   Future<void> _handleMethodCall(MethodCall call) async {
     switch (call.method) {
-      case 'start':
-        _startTimer();
-        break;
-      case 'pause':
-        _pauseTimer();
-        break;
-      case 'reset':
-        _resetTimer();
+      case 'onTimerUpdate':
+        final Map<String, dynamic> args =
+            call.arguments.cast<String, dynamic>();
+        setState(() {
+          _timeText = args['timeText'] ?? "00:00:00";
+          _isRunning = args['isRunning'] ?? false;
+        });
         break;
       default:
         throw MissingPluginException();
     }
-  }
-
-  void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        _duration++;
-      });
-    });
-    setState(() {
-      _isRunning = true;
-    });
-  }
-
-  void _pauseTimer() {
-    _timer.cancel();
-    setState(() {
-      _isRunning = false;
-    });
-  }
-
-  void _resetTimer() {
-    _timer.cancel();
-    setState(() {
-      _duration = 0;
-      _isRunning = false;
-    });
-  }
-
-  String _formatDuration(int seconds) {
-    final duration = Duration(seconds: seconds);
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
   }
 
   @override
@@ -104,18 +66,44 @@ class _NativeTimerPageState extends State<NativeTimerPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              _formatDuration(_duration),
-              style: Theme.of(context).textTheme.headlineMedium,
+              _timeText,
+              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: _isRunning ? Colors.green : Colors.grey,
+                  ),
             ),
             const SizedBox(height: 20),
-            SizedBox(
-              height: 100,
-              child: AndroidView(
-                viewType: 'NativeTimerView',
-                layoutDirection: TextDirection.ltr,
-                creationParams: const {},
-                creationParamsCodec: const StandardMessageCodec(),
+            Text(
+              _isRunning ? 'Timer is running' : 'Timer is stopped',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: _isRunning ? Colors.green : Colors.grey,
+                  ),
+            ),
+            const SizedBox(height: 40),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(8),
               ),
+              child: const SizedBox(
+                height: 150,
+                width: double.infinity,
+                child: AndroidView(
+                  viewType: 'NativeTimerView',
+                  layoutDirection: TextDirection.ltr,
+                  creationParams: {},
+                  creationParamsCodec: StandardMessageCodec(),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Controls are fully native Android',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontStyle: FontStyle.italic,
+                    color: Colors.grey,
+                  ),
             ),
           ],
         ),
